@@ -6,6 +6,12 @@ from pyqrcode import QRCode
 import uuid
 from pathlib import Path
 import os
+from django.http import HttpResponse
+from django.template import loader
+import io
+from django.http import FileResponse
+
+
 def home(request):
     form = QRcodeForm()
     return render(request, 'index.html',{'form':form})
@@ -23,5 +29,9 @@ def convert(request):
     qrcodeFilename=os.path.join(BASE_DIR, 'qrcodeimages', uuidFilename+'.png')
     a=url.png(qrcodeFilename, scale=6)
     print(a)
+
     context={'form':form,'qrcodeFilename':qrcodeFilename}
-    return render(request, 'index.html',context)
+    template = loader.get_template('index.html')
+    img = open(qrcodeFilename, 'rb')
+    response = FileResponse(img)
+    return response
